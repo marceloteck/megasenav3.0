@@ -1,0 +1,12 @@
+# Ignore arquivos de log
+*.log
+
+# Ignore pastas
+/include/
+/lib/
+/Scripts/
+/share/
+/Memory/
+
+# Ignore arquivos 
+pyvenv.cfg
