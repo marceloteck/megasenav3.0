@@ -197,7 +197,7 @@ else:
     best_model.save(model_path)
     print("Modelo salvo.")
     
-    
+
 ######################### Obter os últimos cinco sorteios -12
 print("\n")
 last_five_draws = dados.iloc[-12:, 1:].values.flatten()
@@ -206,17 +206,37 @@ last_five_draws = dados.iloc[-12:, 1:].values.flatten()
 last_five_scaled = scaler_X.transform(last_five_draws.reshape(1, -1))
 last_five_scaled = last_five_scaled.reshape(1, 72, 1)
 
-# Predição dos próximos números
-predicted_scaled = best_model.predict(last_five_scaled)
+# Gerar 10 previsões diferentes
+predicted_sequences = []
+for _ in range(10):
+    predicted_scaled = best_model.predict(last_five_scaled)
 
-# Desescalonando as previsões e arredondando para os números mais próximos
-predicted_numbers = scaler_y.inverse_transform(predicted_scaled)
-predicted_numbers = predicted_numbers.astype(int)
+    # Desescalonando as previsões e arredondando para os números mais próximos
+    predicted_numbers = scaler_y.inverse_transform(predicted_scaled)
+    predicted_numbers = np.round(predicted_numbers).astype(int)
 
-# Garantir que os números estão no intervalo de 1 a 60
-predicted_numbers = np.clip(predicted_numbers, 1, 60)
+    # Garantir que os números estão no intervalo de 1 a 60
+    predicted_numbers = np.clip(predicted_numbers, 1, 60)
 
-print("\nNúmeros previstos para o próximo sorteio:", predicted_numbers[0])
+    # Adicionando a sequência à lista de previsões
+    predicted_sequences.append(predicted_numbers[0])
+
+# Removendo previsões duplicadas, se houver
+unique_predicted_sequences = np.unique(predicted_sequences, axis=0)
+
+# Garantindo que há exatamente 10 sequências únicas
+if len(unique_predicted_sequences) < 10:
+    print("\nAviso: Menos de 10 sequências únicas previstas. Tente novamente para mais opções.")
+
+print("\n10 opções de sequências previstas para o próximo sorteio:")
+for i, seq in enumerate(unique_predicted_sequences):
+    print(f"Opção {i+1}: {seq}")
+
+
+
+
+
+
 
 
 ##################################### PLOTAGEM
