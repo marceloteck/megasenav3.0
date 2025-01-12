@@ -1,4 +1,1 @@
-Mega-Sena.csv
-Mega-Sena_jan_2025.csv
-mega_sena_base.csv
-Mega-Sena1.1.csv
+Mega_Sena.csv
