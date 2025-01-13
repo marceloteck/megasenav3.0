@@ -157,7 +157,6 @@ def avaliation_modell(X_test_scaled, y_test_scaled):
     
 ###############################################
 
-"""
 if newTrainer == "noTrainner":
     model_path = 'MEGA-SENA/Trainner/megasena_model_training.keras'
 else:
@@ -214,83 +213,6 @@ best_model.fit(
 avaliation_modell(X_test_scaled, y_test_scaled)
 best_model.save(model_path)
 print("Modelo salvo.")
-
-"""
-
-def calculate_mse(y_true, y_pred):
-    return np.mean(np.square(y_true - y_pred))
-
-def train_and_evaluate_model(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled, model_path_temp):
-    best_model = None
-    mse_threshold = 70
-    mse = float('inf')
-
-    while mse > mse_threshold:
-        print("\nTreinando o modelo...")
-        tuner, best_hps = tune_hyperparameters(X_train_scaled, y_train_scaled)
-        model = tuner.hypermodel.build(best_hps)
-        model.fit(
-            X_train_scaled, 
-            y_train_scaled, 
-            epochs=500, 
-            validation_split=0.2, 
-            batch_size=16, 
-            callbacks=[EarlyStopping(monitor='val_loss', patience=10)]
-        )
-
-        y_test_pred = model.predict(X_test_scaled)
-        mse = calculate_mse(y_test_scaled, y_test_pred)
-        print(f"MSE atual: {mse}")
-
-        if mse <= mse_threshold:
-            best_model = model
-            break
-        else:
-            print("MSE acima do limite, continuando o treinamento...")
-
-        # Salvar o melhor modelo até agora em um arquivo temporário
-        model.save(model_path_temp)
-
-    return best_model
-
-def main():
-    model_path = 'MEGA-SENA/Trainner/megasena_model_training.keras'
-    model_path_temp = 'MEGA-SENA/Trainner/megasena_model_temp.keras'
-
-    # Carregar e preprocessar os dados
-    folder_path = 'MEGA-SENA/dados_megasena/'
-    X_filename = 'MEGA-SENA/BaseDados/prepared_data_X.npy'
-    y_filename = 'MEGA-SENA/BaseDados/prepared_data_y.npy'
-    processed_files_filename = 'MEGA-SENA/processed_files.txt'
-
-    all_data = load_and_preprocess_data(folder_path, processed_files_filename, X_filename)
-    X, y = prepare_data(all_data, X_filename, y_filename)
-
-    print("Iniciando treinamento...")
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-    scaler_X = MinMaxScaler(feature_range=(1, 60))
-    scaler_y = MinMaxScaler(feature_range=(1, 60))
-    X_train_scaled = scaler_X.fit_transform(X_train).reshape(X_train.shape[0], X_train.shape[1], 1)
-    X_test_scaled = scaler_X.transform(X_test).reshape(X_test.shape[0], X_test.shape[1], 1)
-    y_train_scaled = scaler_y.fit_transform(y_train)
-    y_test_scaled = scaler_y.transform(y_test)
-
-    # Treinar e avaliar o modelo
-    best_model = train_and_evaluate_model(X_train_scaled, y_train_scaled, X_test_scaled, y_test_scaled, model_path_temp)
-
-    # Salvar o melhor modelo
-    best_model.save(model_path)
-    print("Modelo final salvo.")
-
-    # Remover o arquivo temporário
-    if os.path.exists(model_path_temp):
-        os.remove(model_path_temp)
-        print("Arquivo temporário removido.")
-
-if __name__ == "__main__":
-    main()
-
 
 ######################### Obter os últimos cinco sorteios -12
 print("\n")
