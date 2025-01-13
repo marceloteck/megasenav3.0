@@ -1,0 +1,3 @@
+https://github.com/vngasp/RedeNeuralMegaSena/blob/master/Implementando%20uma%20rede%20neural%20com%20dados%20Mega%20Sena.ipynb
+
+https://github.com/search?q=mega%20sena&type=repositories
