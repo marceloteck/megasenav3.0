@@ -1,5 +1,11 @@
 # Imports e configurações iniciais
 import os
+# Configurações do ambiente
+os.system('title Mega Sena Trainer v1.5')
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+
+import keras
 import random
 import numpy as np
 import pandas as pd
@@ -18,10 +24,7 @@ import matplotlib.pyplot as plt
 from collections import Counter
 from itertools import combinations
 
-# Configurações do ambiente
-os.system('title Mega Sena Trainer v1.4')
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+
 
 # Sementes para reproducibilidade
 seed_value = 42
