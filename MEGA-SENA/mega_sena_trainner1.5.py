@@ -184,16 +184,17 @@ if __name__ == "__main__":
     print("Inicializando programa \n")
 
     all_data = load_and_preprocess_data(folder_path, processed_files_filename, X_filename)
+    X, y = prepare_data(all_data, X_filename, y_filename)
+    dados = load_dados(folder_path)
+
+    
 
     # Gerar dados sintéticos
     print("Gerando dados sintéticos...")
-    dados_sinteticos = gerar_dados_sinteticos(all_data)
+    dados_sinteticos = gerar_dados_sinteticos(dados)
     
     # Combinar dados reais com sintéticos
-    dados_combinados = pd.concat([all_data, dados_sinteticos], ignore_index=True)
-
-    X, y = prepare_data(dados_combinados, X_filename, y_filename)
-    dados = load_dados(folder_path)
+    dados_combinados = pd.concat([dados, dados_sinteticos], ignore_index=True)
 
 
 
@@ -225,7 +226,7 @@ if __name__ == "__main__":
     print("Modelo salvo.")
 
     print("\nPrevisão dos próximos números...")
-    last_five_draws = dados.iloc[-12:, 1:].values.flatten()
+    last_five_draws = dados_combinados.iloc[-12:, 1:].values.flatten()
     last_five_scaled = scaler_X.transform(last_five_draws.reshape(1, -1)).reshape(1, 72, 1)
     predicted_scaled = best_model.predict(last_five_scaled)
     predicted_numbers = np.clip(scaler_y.inverse_transform(predicted_scaled).astype(int), 1, 60)
