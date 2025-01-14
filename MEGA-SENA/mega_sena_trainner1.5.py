@@ -32,7 +32,7 @@ tf.random.set_seed(seed_value)
 np.random.seed(seed_value)
 random.seed(seed_value)
 
-# Habilitação da desserialização insegura
+# Habilitação da load_dados insegura
 keras.config.enable_unsafe_deserialization()
 
 # Variáveis globais e configurações
@@ -76,6 +76,10 @@ def load_and_preprocess_data(folder_path, processed_files_filename, X_filename):
     return all_data
 
 def prepare_data(data, X_filename, y_filename, force_prepare=False):
+    if isinstance(data, list):
+        data = pd.DataFrame(data)
+
+
     if not force_prepare and os.path.exists(X_filename) and os.path.exists(y_filename):
         print("Carregando dados preparados dos arquivos...\n")
         X_existing = np.load(X_filename, allow_pickle=True)
@@ -145,6 +149,7 @@ if __name__ == "__main__":
 
     all_data = load_and_preprocess_data(folder_path, processed_files_filename, X_filename)
     X, y = prepare_data(all_data, X_filename, y_filename)
+    dados = load_dados(folder_path)
 
     print("Iniciando treinamento...")
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
