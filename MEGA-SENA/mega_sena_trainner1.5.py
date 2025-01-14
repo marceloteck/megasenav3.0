@@ -190,7 +190,7 @@ if __name__ == "__main__":
     dados_sinteticos = gerar_dados_sinteticos(all_data)
     
     # Combinar dados reais com sintéticos
-    dados_combinados = pd.concat([dados, dados_sinteticos], ignore_index=True)
+    dados_combinados = pd.concat([all_data, dados_sinteticos], ignore_index=True)
 
     X, y = prepare_data(dados_combinados, X_filename, y_filename)
     dados = load_dados(folder_path)
