@@ -46,39 +46,32 @@ model_path = ('MEGA-SENA/Trainner/megasena_model_training.keras' if new_trainer 
               else f'MEGA-SENA/Trainner/megasena_model_training.{current_time}.keras')
 
 
-def gerar_dados_sinteticos(dados_reais, num_amostras=1000):
-    # Contar a frequência de cada número nos dados reais
-    todos_numeros = dados_reais.iloc[:, 1:].values.flatten()
-    frequencia = Counter(todos_numeros)
-    total_numeros = sum(frequencia.values())
+def load_and_preprocess_data(folder_path, processed_files_filename, X_filename):
+    processed_files = set()
+    if os.path.exists(processed_files_filename):
+        with open(processed_files_filename, 'r') as f:
+            processed_files = set(f.read().splitlines())
+
+    new_files = [file for file in os.listdir(folder_path) 
+                 if file.endswith('.csv') and file not in processed_files or not os.path.exists(X_filename)]
     
-    # Converter as frequências em probabilidades
-    probabilidade = {num: freq / total_numeros for num, freq in frequencia.items()}
-    
-    # Gerar dados sintéticos
-    dados_sinteticos = []
-    for _ in range(num_amostras):
-        # Selecionar 6 números baseados nas probabilidades
-        numeros = random.choices(
-            population=list(probabilidade.keys()), 
-            weights=list(probabilidade.values()), 
-            k=6
-        )
-        
-        # Verificar se os números estão dentro de uma soma realista (por exemplo, entre 100 e 300)
-        while not (100 <= sum(numeros) <= 300):
-            numeros = random.choices(
-                population=list(probabilidade.keys()), 
-                weights=list(probabilidade.values()), 
-                k=6
-            )
-        
-        # Adicionar a sequência ao conjunto sintético
-        dados_sinteticos.append(numeros)
-    
-    # Converter para DataFrame para facilitar a manipulação posterior
-    df_sinteticos = pd.DataFrame(dados_sinteticos, columns=[f"Numero{i+1}" for i in range(6)])
-    return df_sinteticos
+    all_data = []
+    for file in new_files:
+        data = pd.read_csv(os.path.join(folder_path, file), sep=';')
+        data['Data'] = pd.to_datetime(data['Data'], format='%d/%m/%Y')
+        all_data.append(data)
+
+    if all_data:
+        all_data = pd.concat(all_data, ignore_index=True).sort_values('Data')
+    else:
+        all_data = pd.DataFrame()
+
+    with open(processed_files_filename, 'a') as f:
+        for file in new_files:
+            f.write(file + '\n')
+
+    return all_data
+
 
 
 # Funções utilitárias e de processamento de dados
