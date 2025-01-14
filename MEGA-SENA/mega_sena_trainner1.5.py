@@ -47,26 +47,31 @@ model_path = ('MEGA-SENA/Trainner/megasena_model_training.keras' if new_trainer 
 
 
 def gerar_dados_sinteticos(dados_originais, num_sintetico=5000):
-    # Remover a coluna de data dos dados originais, usando apenas as colunas dos números
-    dados_originais_numeros = dados_originais[:, 1:]  # Assumindo que a primeira coluna seja a data
+    # Verificar a estrutura dos dados originais (remover a coluna de data)
+    dados_originais_numeros = dados_originais[:, 1:]  # Remove a primeira coluna (data)
+    print("Dimensão dos dados originais (sem a data):", dados_originais_numeros.shape)
 
+    # Gerar combinações possíveis de 6 números
     combinacoes = [comb for comb in combinations(range(1, 61), 6)]
     contador = Counter(tuple(sorted(jogo)) for jogo in dados_originais_numeros)
 
     dados_sinteticos = []
     for _ in range(num_sintetico):
+        # Gerar uma nova combinação
         jogo_sintetico = random.choices(combinacoes, k=1)[0]
+        # Verificar se a combinação já existe nos dados originais
         while contador[tuple(sorted(jogo_sintetico))] > 0:
             jogo_sintetico = random.choices(combinacoes, k=1)[0]
         dados_sinteticos.append(jogo_sintetico)
 
+    # Converter para um array numpy
     dados_sinteticos = np.array(dados_sinteticos)
 
     print("Dimensão dos dados sintéticos:", dados_sinteticos.shape)
-    print("Dimensão dos dados originais (sem a coluna de data):", dados_originais_numeros.shape)
 
-    # Combinar os dados originais e os dados sintéticos (sem a coluna de data)
+    # Combinar os dados originais e os sintéticos (somente os números)
     dados_combinados = np.vstack((dados_originais_numeros, dados_sinteticos))
+
     print("Dimensão dos dados combinados:", dados_combinados.shape)
 
     return dados_combinados
