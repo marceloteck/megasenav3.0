@@ -45,6 +45,42 @@ processed_files_filename = 'MEGA-SENA/processed_files.txt'
 model_path = ('MEGA-SENA/Trainner/megasena_model_training.keras' if new_trainer == "noTrainer" 
               else f'MEGA-SENA/Trainner/megasena_model_training.{current_time}.keras')
 
+
+def gerar_dados_sinteticos(dados_reais, num_amostras=1000):
+    # Contar a frequência de cada número nos dados reais
+    todos_numeros = dados_reais.iloc[:, 1:].values.flatten()
+    frequencia = Counter(todos_numeros)
+    total_numeros = sum(frequencia.values())
+    
+    # Converter as frequências em probabilidades
+    probabilidade = {num: freq / total_numeros for num, freq in frequencia.items()}
+    
+    # Gerar dados sintéticos
+    dados_sinteticos = []
+    for _ in range(num_amostras):
+        # Selecionar 6 números baseados nas probabilidades
+        numeros = random.choices(
+            population=list(probabilidade.keys()), 
+            weights=list(probabilidade.values()), 
+            k=6
+        )
+        
+        # Verificar se os números estão dentro de uma soma realista (por exemplo, entre 100 e 300)
+        while not (100 <= sum(numeros) <= 300):
+            numeros = random.choices(
+                population=list(probabilidade.keys()), 
+                weights=list(probabilidade.values()), 
+                k=6
+            )
+        
+        # Adicionar a sequência ao conjunto sintético
+        dados_sinteticos.append(numeros)
+    
+    # Converter para DataFrame para facilitar a manipulação posterior
+    df_sinteticos = pd.DataFrame(dados_sinteticos, columns=[f"Numero{i+1}" for i in range(6)])
+    return df_sinteticos
+
+
 # Funções utilitárias e de processamento de dados
 def load_dados(folder_path):
     all_data = pd.concat(
@@ -148,8 +184,19 @@ if __name__ == "__main__":
     print("Inicializando programa \n")
 
     all_data = load_and_preprocess_data(folder_path, processed_files_filename, X_filename)
-    X, y = prepare_data(all_data, X_filename, y_filename)
+
+    # Gerar dados sintéticos
+    print("Gerando dados sintéticos...")
+    dados_sinteticos = gerar_dados_sinteticos(all_data)
+    
+    # Combinar dados reais com sintéticos
+    dados_combinados = pd.concat([dados, dados_sinteticos], ignore_index=True)
+
+    X, y = prepare_data(dados_combinados, X_filename, y_filename)
     dados = load_dados(folder_path)
+
+
+
 
     print("Iniciando treinamento...")
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
