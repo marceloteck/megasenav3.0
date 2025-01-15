@@ -198,14 +198,10 @@ if __name__ == "__main__":
     dados_sinteticos = gerar_dados_sinteticos(dados)
 
     if isinstance(all_data, list) and all_data:
-        # Concatene a lista de DataFrames em um único DataFrame
         all_data = pd.concat(all_data, ignore_index=True)
     elif not all_data:
-        # Inicialize como um DataFrame vazio se all_data for vazio ou None
         all_data = pd.DataFrame()
 
-
-    # Agora você pode concatenar com os dados sintéticos
     if all_data.empty:
         combined_data = dados_sinteticos
     else:
