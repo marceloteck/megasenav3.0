@@ -203,8 +203,14 @@ def remove_outliers(data, min_sum=100, max_sum=300):
     return data
 
 def add_year_feature(data):
+    # Garantir que a coluna 'Data' seja convertida para datetime, caso não tenha sido feita antes
+    data['Data'] = pd.to_datetime(data['Data'], format='%d/%m/%Y')
+    
+    # Adicionar a coluna 'ano' com o ano extraído da coluna 'Data'
     data['ano'] = data['Data'].dt.year
+    
     return data
+
 
     
 
@@ -225,6 +231,13 @@ if __name__ == "__main__":
         combined_data = dados_sinteticos
     else:
         combined_data = pd.concat([all_data, dados_sinteticos], ignore_index=True)
+
+    # Adicionar a coluna 'ano'
+    dados = add_year_feature(dados)
+
+    # Verifique a saída para garantir que a coluna 'ano' foi adicionada corretamente
+    print(dados.head())   
+         
 
     # Adicione novas features
     combined_data = add_features(combined_data)
