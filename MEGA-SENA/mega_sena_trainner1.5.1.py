@@ -180,7 +180,7 @@ def gerar_dados_sinteticos(dados_reais, num_amostras=1000):
     # Converter para DataFrame para facilitar a manipulação posterior
     df_sinteticos = pd.DataFrame(dados_sinteticos, columns=["Data"] + [f"Numero{i+1}" for i in range(6)])
     df_sinteticos = df_sinteticos.reset_index(drop=True) 
-    df_sinteticos = df_sinteticos.to_string(index=False)
+    #df_sinteticos = df_sinteticos.to_string(index=False)
     
     return df_sinteticos
 
@@ -197,11 +197,13 @@ if __name__ == "__main__":
     dados = load_dados(folder_path)
     dados_sinteticos = gerar_dados_sinteticos(dados)
 
-    # Verifique se all_data não está vazio
     if isinstance(all_data, list) and all_data:
+        # Concatene a lista de DataFrames em um único DataFrame
         all_data = pd.concat(all_data, ignore_index=True)
     elif not all_data:
-        all_data = pd.DataFrame()  # Se estiver vazio, inicialize como um DataFrame vazio
+        # Inicialize como um DataFrame vazio se all_data for vazio ou None
+        all_data = pd.DataFrame()
+
 
     # Agora você pode concatenar com os dados sintéticos
     if all_data.empty:
@@ -209,10 +211,7 @@ if __name__ == "__main__":
     else:
         combined_data = pd.concat([all_data, dados_sinteticos], ignore_index=True)
 
-    if isinstance(combined_data, pd.DataFrame):
-        combined_data_list = combined_data.values.tolist()
-    else:
-        raise TypeError("combined_data não é um DataFrame")
+    combined_data_list = combined_data.values.tolist()
 
     X, y = prepare_data(combined_data_list, X_filename, y_filename)
     
