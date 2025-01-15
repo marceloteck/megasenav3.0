@@ -209,9 +209,17 @@ if __name__ == "__main__":
     else:
         combined_data = pd.concat([all_data, dados_sinteticos], ignore_index=True)
 
+    if isinstance(combined_data, pd.DataFrame):
     combined_data_list = combined_data.values.tolist()
+    else:
+        raise TypeError("combined_data não é um DataFrame")
+
     X, y = prepare_data(combined_data_list, X_filename, y_filename)
     
+    
+
+
+
     
 
 
