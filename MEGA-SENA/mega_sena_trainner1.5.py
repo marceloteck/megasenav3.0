@@ -1,7 +1,7 @@
 # Imports e configurações iniciais
 import os
 # Configurações do ambiente
-os.system('title Mega Sena Trainer v1.4')
+os.system('title Mega Sena Trainer v1.5')
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 

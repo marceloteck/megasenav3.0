@@ -1,7 +1,7 @@
 # Imports e configurações iniciais
 import os
 # Configurações do ambiente
-os.system('title Mega Sena Trainer v1.5.1')
+os.system('title Mega Sena Trainer v1.5.2')
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
@@ -89,8 +89,9 @@ def prepare_data(data, X_filename, y_filename, force_prepare=False):
 
     if not data.empty:
         print("Adicionando novos dados...")
-        X_new = np.array([data.iloc[i - 12:i, 1:].values.flatten() for i in tqdm(range(12, len(data)), desc="Preparando dados", unit="iteração")])
-        y_new = np.array([data.iloc[i, 1:].values for i in range(12, len(data))])
+        NTime = 36 # dias de analise
+        X_new = np.array([data.iloc[i - NTime:i, 1:].values.flatten() for i in tqdm(range(NTime, len(data)), desc="Preparando dados", unit="iteração")])
+        y_new = np.array([data.iloc[i, 1:].values for i in range(NTime, len(data))])
 
         if X_existing.size > 0:
             X = np.concatenate((X_existing, X_new))
@@ -185,7 +186,25 @@ def gerar_dados_sinteticos(dados_reais, num_amostras=1000):
     return df_sinteticos
 
 
+def add_features(data, NTime=36):
+    data['media_movel'] = data.iloc[:, 1:].rolling(window=NTime).mean().mean(axis=1)
+    data['desvio_padrao'] = data.iloc[:, 1:].rolling(window=NTime).std().mean(axis=1)
+    for num in range(1, 61):
+        data[f'freq_num_{num}'] = data.iloc[:, 1:].apply(lambda row: (row == num).sum(), axis=1)
+    return data
 
+def normalize_individual_draws(data):
+    scaler = MinMaxScaler(feature_range=(0, 1))
+    data.iloc[:, 1:] = scaler.fit_transform(data.iloc[:, 1:])
+    return data
+
+def remove_outliers(data, min_sum=100, max_sum=300):
+    data = data[(data.iloc[:, 1:].sum(axis=1) >= min_sum) & (data.iloc[:, 1:].sum(axis=1) <= max_sum)]
+    return data
+
+def add_year_feature(data):
+    data['ano'] = data['Data'].dt.year
+    return data
 
     
 
@@ -207,9 +226,14 @@ if __name__ == "__main__":
     else:
         combined_data = pd.concat([all_data, dados_sinteticos], ignore_index=True)
 
-    combined_data_list = combined_data.values.tolist()
+    # Adicione novas features
+    combined_data = add_features(combined_data)
+    combined_data = normalize_individual_draws(combined_data)
+    combined_data = remove_outliers(combined_data)
+    combined_data = add_year_feature(combined_data)
 
-    X, y = prepare_data(combined_data_list, X_filename, y_filename)
+    combined_data_list = combined_data.values.tolist()
+    X, y = prepare_data(combined_data_list, X_filename, y_filename, N=36)
     
     
 
@@ -245,8 +269,8 @@ if __name__ == "__main__":
     print("Modelo salvo.")
 
     print("\nPrevisão dos próximos números...")
-    last_five_draws = dados.iloc[-12:, 1:].values.flatten()
-    last_five_scaled = scaler_X.transform(last_five_draws.reshape(1, -1)).reshape(1, 72, 1)
+    last_five_draws = dados.iloc[-36:, 1:].values.flatten()
+    last_five_scaled = scaler_X.transform(last_five_draws.reshape(1, -1)).reshape(1, 216, 1)
     predicted_scaled = best_model.predict(last_five_scaled)
     predicted_numbers = np.clip(scaler_y.inverse_transform(predicted_scaled).astype(int), 1, 60)
     print("\nNúmeros previstos para o próximo sorteio:", predicted_numbers[0])
