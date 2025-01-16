@@ -199,7 +199,7 @@ if __name__ == "__main__":
 
     if isinstance(all_data, list) and all_data:
         all_data = pd.concat(all_data, ignore_index=True)
-    elif not all_data:
+    else:
         all_data = pd.DataFrame()
 
     if all_data.empty:

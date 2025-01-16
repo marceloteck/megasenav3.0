@@ -89,7 +89,7 @@ def prepare_data(data, X_filename, y_filename, force_prepare=False):
 
     if not data.empty:
         print("Adicionando novos dados...")
-        NTime = 36 # dias de analise
+        NTime = 36  # número de sorteios anteriores a serem considerados
         X_new = np.array([data.iloc[i - NTime:i, 1:].values.flatten() for i in tqdm(range(NTime, len(data)), desc="Preparando dados", unit="iteração")])
         y_new = np.array([data.iloc[i, 1:].values for i in range(NTime, len(data))])
 
@@ -175,7 +175,7 @@ def gerar_dados_sinteticos(dados_reais, num_amostras=1000):
         
         if tentativas < limite_tentativas:
             # Adicionar a data fictícia e a sequência ao conjunto sintético
-            data_ficticia = f"{(i % 28) + 1:02d}/{(i % 12) + 1:02d}/2025"  # Gera datas fictícias no formato d/m/ano
+            data_ficticia = f"{(i % 28) + 1:02d}/{(i % 12) + 1:02d}/2004"  # Gera datas fictícias no formato d/m/ano
             dados_sinteticos.append([data_ficticia] + numeros)
     
     # Converter para DataFrame para facilitar a manipulação posterior
@@ -195,8 +195,17 @@ def add_features(data, NTime=36):
 
 def normalize_individual_draws(data):
     scaler = MinMaxScaler(feature_range=(0, 1))
-    data.iloc[:, 1:] = scaler.fit_transform(data.iloc[:, 1:])
+    # Normalizar os valores
+    normalized_values = scaler.fit_transform(data.iloc[:, 1:])
+    
+    # Converter os valores normalizados de volta para DataFrame
+    normalized_df = pd.DataFrame(normalized_values, columns=data.columns[1:], index=data.index)
+    
+    # Substituir as colunas originais pelos valores normalizados
+    data.update(normalized_df)
     return data
+
+
 
 def remove_outliers(data, min_sum=100, max_sum=300):
     data = data[(data.iloc[:, 1:].sum(axis=1) >= min_sum) & (data.iloc[:, 1:].sum(axis=1) <= max_sum)]
@@ -224,7 +233,7 @@ if __name__ == "__main__":
 
     if isinstance(all_data, list) and all_data:
         all_data = pd.concat(all_data, ignore_index=True)
-    elif not all_data:
+    else    :
         all_data = pd.DataFrame()
 
     if all_data.empty:
@@ -232,21 +241,16 @@ if __name__ == "__main__":
     else:
         combined_data = pd.concat([all_data, dados_sinteticos], ignore_index=True)
 
-    # Adicionar a coluna 'ano'
-    dados = add_year_feature(dados)
-
-    # Verifique a saída para garantir que a coluna 'ano' foi adicionada corretamente
-    print(dados.head())   
          
 
     # Adicione novas features
     combined_data = add_features(combined_data)
     combined_data = normalize_individual_draws(combined_data)
     combined_data = remove_outliers(combined_data)
-    combined_data = add_year_feature(combined_data)
+    """combined_data = add_year_feature(combined_data)"""
 
     combined_data_list = combined_data.values.tolist()
-    X, y = prepare_data(combined_data_list, X_filename, y_filename, N=36)
+    X, y = prepare_data(combined_data_list, X_filename, y_filename)
     
     
 
@@ -258,6 +262,7 @@ if __name__ == "__main__":
     print("Iniciando treinamento...")
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
+    NTime = 36  # número de sorteios anteriores a serem considerados
     scaler_X = MinMaxScaler(feature_range=(1, 60))
     scaler_y = MinMaxScaler(feature_range=(1, 60))
     X_train_scaled = scaler_X.fit_transform(X_train).reshape(X_train.shape[0], X_train.shape[1], 1)
@@ -280,11 +285,10 @@ if __name__ == "__main__":
     evaluate_model(X_test_scaled, y_test_scaled, best_model)
     best_model.save(model_path)
     print("Modelo salvo.")
-
     print("\nPrevisão dos próximos números...")
-    last_five_draws = dados.iloc[-36:, 1:].values.flatten()
-    last_five_scaled = scaler_X.transform(last_five_draws.reshape(1, -1)).reshape(1, 216, 1)
-    predicted_scaled = best_model.predict(last_five_scaled)
+    last_thirty_six_draws = dados.iloc[-NTime:, 1:].values.flatten()
+    last_thirty_six_scaled = scaler_X.transform(last_thirty_six_draws.reshape(1, -1)).reshape(1, NTime * 6, 1)
+    predicted_scaled = best_model.predict(last_thirty_six_scaled)
     predicted_numbers = np.clip(scaler_y.inverse_transform(predicted_scaled).astype(int), 1, 60)
     print("\nNúmeros previstos para o próximo sorteio:", predicted_numbers[0])
 
