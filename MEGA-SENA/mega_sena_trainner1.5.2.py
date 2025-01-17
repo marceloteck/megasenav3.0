@@ -36,14 +36,15 @@ random.seed(seed_value)
 keras.config.enable_unsafe_deserialization()
 
 # Variáveis globais e configurações
+teste_dir = "TESTE/"
 new_trainer = "noTrainer"  # Opções: "yesTrainer" | "noTrainer"
 current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
 folder_path = 'MEGA-SENA/dados_megasena/'
-X_filename = 'MEGA-SENA/BaseDados/prepared_data_X.npy'
-y_filename = 'MEGA-SENA/BaseDados/prepared_data_y.npy'
-processed_files_filename = 'MEGA-SENA/processed_files.txt'
-model_path = ('MEGA-SENA/Trainner/megasena_model_training.keras' if new_trainer == "noTrainer" 
-              else f'MEGA-SENA/Trainner/megasena_model_training.{current_time}.keras')
+X_filename = f'MEGA-SENA/{teste_dir}BaseDados/prepared_data_X.npy'
+y_filename = f'MEGA-SENA/{teste_dir}BaseDados/prepared_data_y.npy'
+processed_files_filename = f'MEGA-SENA/{teste_dir}processed_files.txt'
+model_path = (f'MEGA-SENA/{teste_dir}Trainner/megasena_model_training.keras' if new_trainer == "noTrainer" 
+              else f'MEGA-SENA/{teste_dir}Trainner/megasena_model_training.{current_time}.keras')
 
 # Funções utilitárias e de processamento de dados
 def load_dados(folder_path):
@@ -186,12 +187,28 @@ def gerar_dados_sinteticos(dados_reais, num_amostras=1000):
     return df_sinteticos
 
 
-def add_features(data, NTime=36):
-    data['media_movel'] = data.iloc[:, 1:].rolling(window=NTime).mean().mean(axis=1)
-    data['desvio_padrao'] = data.iloc[:, 1:].rolling(window=NTime).std().mean(axis=1)
-    for num in range(1, 61):
-        data[f'freq_num_{num}'] = data.iloc[:, 1:].apply(lambda row: (row == num).sum(), axis=1)
-    return data
+def add_features(df):
+    # Remove a coluna 'Data' se existir
+    if 'Data' in df.columns:
+        df = df.drop(columns=['Data'])
+
+    # Frequência dos números
+    frequency = {i: 0 for i in range(1, 61)}
+    for row in df.itertuples(index=False):
+        for number in row:
+            frequency[number] += 1
+
+    # Adiciona colunas de frequência
+    for i in range(1, 61):
+        df[f'freq_{i}'] = frequency[i]
+
+    # Adiciona colunas de média e desvio padrão
+    df['mean'] = df.mean(axis=1)
+    df['std'] = df.std(axis=1)
+
+    return df
+
+
 
 def normalize_individual_draws(data):
     scaler = MinMaxScaler(feature_range=(0, 1))
@@ -245,19 +262,14 @@ if __name__ == "__main__":
 
     # Adicione novas features
     combined_data = add_features(combined_data)
-    combined_data = normalize_individual_draws(combined_data)
+    """combined_data = normalize_individual_draws(combined_data)
     combined_data = remove_outliers(combined_data)
-    """combined_data = add_year_feature(combined_data)"""
+    combined_data = add_year_feature(combined_data)"""
 
     combined_data_list = combined_data.values.tolist()
     X, y = prepare_data(combined_data_list, X_filename, y_filename)
     
     
-
-
-
-    
-
 
     print("Iniciando treinamento...")
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)

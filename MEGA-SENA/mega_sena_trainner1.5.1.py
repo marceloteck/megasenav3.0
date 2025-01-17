@@ -142,7 +142,7 @@ def evaluate_model(X_test_scaled, y_test_scaled, best_model):
     print(f"Erro Médio Quadrado (MSE): {mse}")
     print(f"Erro Absoluto Médio (MAE): {mae}")
     
-def gerar_dados_sinteticos(dados_reais, num_amostras=1000):
+"""def gerar_dados_sinteticos(dados_reais, num_amostras=1000):
     # Contar a frequência de cada número nos dados reais, excluindo o zero
     todos_numeros = dados_reais.iloc[:, 1:].values.flatten()
     todos_numeros = [num for num in todos_numeros if num != 0]
@@ -182,8 +182,56 @@ def gerar_dados_sinteticos(dados_reais, num_amostras=1000):
     df_sinteticos = df_sinteticos.reset_index(drop=True) 
     #df_sinteticos = df_sinteticos.to_string(index=False)
     
-    return df_sinteticos
+    return df_sinteticos"""
 
+def gerar_dados_sinteticos(dados_reais, num_amostras=1000):
+    # Contar a frequência de cada número nos dados reais, excluindo o zero
+    todos_numeros = dados_reais.iloc[:, 1:].values.flatten()
+    todos_numeros = [num for num in todos_numeros if num != 0]
+    frequencia = Counter(todos_numeros)
+    total_numeros = sum(frequencia.values())
+    
+    # Converter as frequências em probabilidades
+    probabilidade = {num: freq / total_numeros for num, freq in frequencia.items()}
+    
+    # Obter as datas já existentes para evitar duplicação
+    datas_existentes = set(dados_reais['Data'].dt.strftime('%d/%m/%Y'))
+    
+    # Gerar dados sintéticos
+    dados_sinteticos = []
+    for i in range(num_amostras):
+        tentativas = 0
+        limite_tentativas = 100  # Define um limite para evitar loop infinito
+        
+        while tentativas < limite_tentativas:
+            # Selecionar 6 números baseados nas probabilidades
+            numeros = random.choices(
+                population=list(probabilidade.keys()), 
+                weights=list(probabilidade.values()), 
+                k=6
+            )
+            
+            # Verificar se os números estão dentro de uma soma realista
+            if 100 <= sum(numeros) <= 300:
+                numeros.sort()  # Ordenar os números em ordem crescente
+                
+                # Gerar uma data aleatória
+                dia = random.randint(1, 28)
+                mes = random.randint(1, 12)
+                ano = random.randint(1996, 2024)
+                data_ficticia = f"{dia:02d}/{mes:02d}/{ano}"
+                
+                if data_ficticia not in datas_existentes:
+                    break  # Encontramos uma data única
+            tentativas += 1
+        
+        if tentativas < limite_tentativas:
+            dados_sinteticos.append([data_ficticia] + numeros)
+            datas_existentes.add(data_ficticia)  # Adicionar a nova data ao conjunto para evitar duplicações
+    
+    # Converter para DataFrame para facilitar a manipulação posterior
+    df_sinteticos = pd.DataFrame(dados_sinteticos, columns=["Data"] + [f"Numero{i+1}" for i in range(6)])
+    return df_sinteticos
 
 
 
