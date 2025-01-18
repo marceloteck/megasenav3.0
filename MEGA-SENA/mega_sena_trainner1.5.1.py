@@ -279,14 +279,14 @@ if __name__ == "__main__":
     if os.path.exists(model_path):
         print("\nCarregando modelo salvo...")
         best_model = load_model(model_path)
-    #else:
-    print("\nTreinando o melhor modelo...")
-    tuner, best_hps = tune_hyperparameters(X_train_scaled, y_train_scaled)
-    best_model = tuner.hypermodel.build(best_hps)
-    best_model.fit(X_train_scaled, y_train_scaled, epochs=500, validation_split=0.2, batch_size=16, callbacks=[EarlyStopping(monitor='val_loss', patience=10)])
+    else:
+        print("\nTreinando o melhor modelo...")
+        tuner, best_hps = tune_hyperparameters(X_train_scaled, y_train_scaled)
+        best_model = tuner.hypermodel.build(best_hps)
+        best_model.fit(X_train_scaled, y_train_scaled, epochs=500, validation_split=0.2, batch_size=16, callbacks=[EarlyStopping(monitor='val_loss', patience=10)])
 
-   # print("\nContinuando o treinamento com os novos dados...")
-    #best_model.fit(X_train_scaled, y_train_scaled, epochs=100, validation_split=0.2, batch_size=16, callbacks=[EarlyStopping(monitor='val_loss', patience=10)])
+    print("\nContinuando o treinamento com os novos dados...")
+    best_model.fit(X_train_scaled, y_train_scaled, epochs=100, validation_split=0.2, batch_size=16, callbacks=[EarlyStopping(monitor='val_loss', patience=10)])
 
     evaluate_model(X_test_scaled, y_test_scaled, best_model)
     best_model.save(model_path)
