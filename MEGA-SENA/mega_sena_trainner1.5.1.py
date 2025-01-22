@@ -141,48 +141,6 @@ def evaluate_model(X_test_scaled, y_test_scaled, best_model):
     mae = mean_absolute_error(y_test_rescaled, y_pred)
     print(f"Erro Médio Quadrado (MSE): {mse}")
     print(f"Erro Absoluto Médio (MAE): {mae}")
-    
-"""def gerar_dados_sinteticos(dados_reais, num_amostras=1000):
-    # Contar a frequência de cada número nos dados reais, excluindo o zero
-    todos_numeros = dados_reais.iloc[:, 1:].values.flatten()
-    todos_numeros = [num for num in todos_numeros if num != 0]
-    frequencia = Counter(todos_numeros)
-    total_numeros = sum(frequencia.values())
-    
-    # Converter as frequências em probabilidades
-    probabilidade = {num: freq / total_numeros for num, freq in frequencia.items()}
-    
-    # Gerar dados sintéticos
-    dados_sinteticos = []
-    for i in range(num_amostras):
-        tentativas = 0
-        limite_tentativas = 100  # Define um limite para evitar loop infinito
-        
-        while tentativas < limite_tentativas:
-            # Selecionar 6 números baseados nas probabilidades
-            numeros = random.choices(
-                population=list(probabilidade.keys()), 
-                weights=list(probabilidade.values()), 
-                k=6
-            )
-            
-            # Verificar se os números estão dentro de uma soma realista
-            if 100 <= sum(numeros) <= 300:
-                numeros.sort()  # Ordenar os números em ordem crescente
-                break
-            tentativas += 1
-        
-        if tentativas < limite_tentativas:
-            # Adicionar a data fictícia e a sequência ao conjunto sintético
-            data_ficticia = f"{(i % 28) + 1:02d}/{(i % 12) + 1:02d}/2025"  # Gera datas fictícias no formato d/m/ano
-            dados_sinteticos.append([data_ficticia] + numeros)
-    
-    # Converter para DataFrame para facilitar a manipulação posterior
-    df_sinteticos = pd.DataFrame(dados_sinteticos, columns=["Data"] + [f"Numero{i+1}" for i in range(6)])
-    df_sinteticos = df_sinteticos.reset_index(drop=True) 
-    #df_sinteticos = df_sinteticos.to_string(index=False)
-    
-    return df_sinteticos"""
 
 def gerar_dados_sinteticos(dados_reais, num_amostras=1000):
     # Contar a frequência de cada número nos dados reais, excluindo o zero
@@ -218,7 +176,7 @@ def gerar_dados_sinteticos(dados_reais, num_amostras=1000):
                 # Gerar uma data aleatória
                 dia = random.randint(1, 28)
                 mes = random.randint(1, 12)
-                ano = random.randint(1996, 2024)
+                ano = random.randint(1996, 2023)
                 data_ficticia = f"{dia:02d}/{mes:02d}/{ano}"
                 
                 if data_ficticia not in datas_existentes:
@@ -259,12 +217,6 @@ if __name__ == "__main__":
 
     X, y = prepare_data(combined_data_list, X_filename, y_filename)
     
-    
-
-
-
-    
-
 
     print("Iniciando treinamento...")
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -301,3 +253,7 @@ if __name__ == "__main__":
 
     # Continuação do código de previsão...
  
+
+
+
+  
