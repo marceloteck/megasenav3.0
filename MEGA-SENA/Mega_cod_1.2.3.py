@@ -1,6 +1,6 @@
 import os
 
-# Configuração do ambiente TensorFlow
+# Configuração do ambiente TensorFlow  {DEVE FICAR DEPOIS DO "OS" E ANTES DO "NP"}
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
@@ -77,6 +77,13 @@ def treinamento_supervisionado_com_calculos_auto_v2(modelo, sequencias, start_li
             entradas_treinamento = np.expand_dims(entradas, axis=-1)
             modelo.fit(entradas_treinamento, np.tile(seq_real, (max_tentativas, 1)), epochs=1, verbose=0)
             
+def calcular_ajustes_necessarios(previsao, real):
+    """
+    Calcula os ajustes necessários para transformar a previsão na sequência real.
+    """
+    ajustes_necessarios = np.array(real) - np.array(previsao)
+    return ajustes_necessarios
+
 def treinamento_supervisionado_com_calculos_auto_v3(modelo, sequencias, start_line=15, max_tentativas=3):
     # Dicionário para armazenar as contagens de acertos
     acertos_por_quantidade = {i: 0 for i in range(7)}  # De 0 a 6 acertos
@@ -89,6 +96,8 @@ def treinamento_supervisionado_com_calculos_auto_v3(modelo, sequencias, start_li
         entradas = np.expand_dims(entradas, axis=-1)  # Ajustar a forma para Conv1D
         previsoes = modelo.predict(entradas)  # Realiza as previsões para as entradas geradas
 
+        melhor_ajuste_encontrado = None  # Para armazenar o ajuste mais próximo do real
+
         for tentativa, previsao in enumerate(previsoes):
             previsao_ordenada = np.clip(np.round(previsao), 1, 60).astype(int)
             acertos = len(set(previsao_ordenada) & set(seq_real))  # Calcula a quantidade de números acertados
@@ -100,15 +109,24 @@ def treinamento_supervisionado_com_calculos_auto_v3(modelo, sequencias, start_li
                 print(f"Acertou na tentativa {tentativa + 1}: {previsao_ordenada} (Acertos: {acertos})")
                 break
         else:
-            acertos = len(set(previsao_ordenada) & set(seq_real))  # Calcula os acertos mesmo em caso de erro
-            print(f"Errou para a linha {i}: Previsão -> {previsao_ordenada}, Real -> {seq_real}, Acertos -> {acertos}")
-            entradas_treinamento = np.expand_dims(entradas, axis=-1)
-            modelo.fit(entradas_treinamento, np.tile(seq_real, (max_tentativas, 1)), epochs=1, verbose=0)
+            # Caso nenhuma tentativa acerte, calcula os ajustes necessários
+            previsao_final = np.clip(np.round(previsoes[-1]), 1, 60).astype(int)
+            ajustes_necessarios = calcular_ajustes_necessarios(previsao_final, seq_real)
+
+            # Mostra os ajustes necessários para melhorar
+            print(f"Errou para a linha {i}: Previsão -> {previsao_final}, Real -> {seq_real}, Acertos -> {acertos}")
+            print(f"Ajustes necessários para acertar: {ajustes_necessarios}")
+
+            # Adiciona os ajustes ao treinamento
+            entradas_treinamento = calcular_previsao(seq_referencia, [ajustes_necessarios])
+            entradas_treinamento = np.expand_dims(entradas_treinamento, axis=-1)
+            modelo.fit(entradas_treinamento, np.tile(seq_real, (1, 1)), epochs=1, verbose=0)
 
     # Exibe o relatório de acertos
     print("\nRelatório de Acertos:")
     for quantidade, total in acertos_por_quantidade.items():
         print(f"Acertos {quantidade}: {total} vezes")
+
             
 
 
@@ -130,5 +148,5 @@ if __name__ == "__main__":
     treinamento_supervisionado_com_calculos_auto_v3(modelo, sequencias, start_line=15, max_tentativas=3)
 
     # Salvar o modelo treinado
-    #modelo.save("modelo_megasena.keras")
+    #modelo.save("modelo_megasena.keras") PAUSADO POR ENQUANTO
     #print("Modelo salvo com sucesso!")
