@@ -309,6 +309,7 @@ def treinar_modelo_basico(modelo, entradas, saidas, dados):
         acertos_rede_totais[acertos_rede] += 1
         resultado_rd_plus = [int(previsao_lt[j] + previsao_rede[j]) for j in range(6)]
 
+        
         print(f"\n[INFO] Concurso Referência (Linha {L_REFER}): {list(map(int, concurso_referencia))}")
         print(f"[INFO] Concurso Atual (Linha {L_ATUAL}): {list(map(int, concurso_atual))}")
         print(f"[INFO] Resultado Esperado (Linha {L_ESPER}): {list(map(int, resultado_esperado))}\n")
@@ -320,6 +321,7 @@ def treinar_modelo_basico(modelo, entradas, saidas, dados):
         print(f"[INFO] Previsão da próx. sequência Rede Neural: {list(map(int, resultado_rd_plus))}")
         print(f"[INFO] Acertos da Rede Neural: {acertos_rede} acertos")
         print("-" * 50)
+        
 
     print("\n[INFO] Relatório Final de Acertos do Cálculo LT:")
     for acertos, quantidade in acertos_lt_totais.items():
@@ -453,6 +455,9 @@ if __name__ == "__main__":
     # Continuação do código de previsão...
      
     main()
+    
+    print("\n\n Números previstos para o próximo sorteio:", predicted_numbers[0])
+    print("\nNúmeros previstos para o próximo sorteio 2:", predicted_scaled[0])
  
 
 
