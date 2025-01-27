@@ -448,6 +448,7 @@ if __name__ == "__main__":
     predicted_scaled = best_model.predict(last_five_scaled)
     predicted_numbers = np.clip(scaler_y.inverse_transform(predicted_scaled).astype(int), 1, 60)
     print("\nNúmeros previstos para o próximo sorteio:", predicted_numbers[0])
+    print("\nNúmeros previstos para o próximo sorteio 2:", predicted_scaled[0])
 
     # Continuação do código de previsão...
      
