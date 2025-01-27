@@ -3,3 +3,5 @@ Mega_Sena.csv
 Mega_Sena.csv
 Mega_Sena.csv
 Mega_Sena.1.0.csv
+Mega_Sena.1.0.csv
+Mega_Sena.csv
