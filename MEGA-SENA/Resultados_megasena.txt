@@ -1,0 +1,193 @@
+
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.87868163277444
+Erro Absoluto Médio (MAE): 7.493618996598079
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.86281390977693
+Erro Absoluto Médio (MAE): 7.492283708059002
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.85516652576267
+Erro Absoluto Médio (MAE): 7.491649257945504
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.85121952719038
+Erro Absoluto Médio (MAE): 7.49131047746927
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.84907608401443
+Erro Absoluto Médio (MAE): 7.491117666961887
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.84786308551814
+Erro Absoluto Médio (MAE): 7.49100356688474
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.84717064051036
+Erro Absoluto Médio (MAE): 7.490935509217614
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.84386143139243
+Erro Absoluto Médio (MAE): 7.49083142527072
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.84613369631144
+Erro Absoluto Médio (MAE): 7.49085506993394
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.84453488701456
+Erro Absoluto Médio (MAE): 7.490855747365696
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.84448339820862
+Erro Absoluto Médio (MAE): 7.490749785819368
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.84514100264977
+Erro Absoluto Médio (MAE): 7.490781042027602
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.83637108937339
+Erro Absoluto Médio (MAE): 7.491009481875442
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.84101754429797
+Erro Absoluto Médio (MAE): 7.4909288258476066
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.84254883744906
+Erro Absoluto Médio (MAE): 7.490873809379266
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.84384876259394
+Erro Absoluto Médio (MAE): 7.490855602019611
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.84467396082249
+Erro Absoluto Médio (MAE): 7.49084398283253
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.84519135713285
+Erro Absoluto Médio (MAE): 7.490836184292554
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.84552002330777
+Erro Absoluto Médio (MAE): 7.4908315230180875
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.84572708844222
+Erro Absoluto Médio (MAE): 7.49082834070379
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.84588387894699
+Erro Absoluto Médio (MAE): 7.490825791622441
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.8459538100591
+Erro Absoluto Médio (MAE): 7.490824540456136
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.84599601055645
+Erro Absoluto Médio (MAE): 7.49082361653102
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.84602650356223
+Erro Absoluto Médio (MAE): 7.4908232340413194
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.8460470372305
+Erro Absoluto Médio (MAE): 7.49082293994924
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.84605734286681
+Erro Absoluto Médio (MAE): 7.49082285155162
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.84606560881656
+Erro Absoluto Médio (MAE): 7.490822702805626
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.8460674981679
+Erro Absoluto Médio (MAE): 7.490822595708511
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.84606832651987
+Erro Absoluto Médio (MAE): 7.490822567659268
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.84611791526302
+Erro Absoluto Médio (MAE): 7.490821503487925
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.84609474448457
+Erro Absoluto Médio (MAE): 7.490822013474191
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
+
+MAIS UM RESULTADO:
+Erro Médio Quadrado (MSE): 84.84608617958831
+Erro Absoluto Médio (MAE): 7.490822197069247
+Números previstos para o próximo sorteio: [ 9 17 27 35 43 52]
+Também: [13 20 26 33 36 46]
