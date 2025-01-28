@@ -89,8 +89,9 @@ def prepare_data(data, X_filename, y_filename, force_prepare=False):
 
     if not data.empty:
         print("Adicionando novos dados...")
-        X_new = np.array([data.iloc[i - 12:i, 1:].values.flatten() for i in tqdm(range(12, len(data)), desc="Preparando dados", unit="iteração")])
-        y_new = np.array([data.iloc[i, 1:].values for i in range(12, len(data))])
+        diasAnalise = 66
+        X_new = np.array([data.iloc[i - diasAnalise:i, 1:].values.flatten() for i in tqdm(range(diasAnalise, len(data)), desc="Preparando dados", unit="iteração")])
+        y_new = np.array([data.iloc[i, 1:].values for i in range(diasAnalise, len(data))])
 
         if X_existing.size > 0:
             X = np.concatenate((X_existing, X_new))
@@ -145,6 +146,7 @@ def evaluate_model(X_test_scaled, y_test_scaled, best_model):
     escrever = f"\n\nMAIS UM RESULTADO:\nErro Médio Quadrado (MSE): {mse}\nErro Absoluto Médio (MAE): {mae}"
     with open("MEGA-SENA/Resultados_megasena.txt", 'a') as f:
         f.write(escrever)
+    return mse        
 
 def gerar_dados_sinteticos(dados_reais, num_amostras=1000):
     # Contar a frequência de cada número nos dados reais, excluindo o zero
@@ -241,26 +243,35 @@ if __name__ == "__main__":
         best_model = tuner.hypermodel.build(best_hps)
         best_model.fit(X_train_scaled, y_train_scaled, epochs=500, validation_split=0.2, batch_size=16, callbacks=[EarlyStopping(monitor='val_loss', patience=10)])
 
-    print("\nContinuando o treinamento com os novos dados...")
-    best_model.fit(X_train_scaled, y_train_scaled, epochs=100, validation_split=0.2, batch_size=16, callbacks=[EarlyStopping(monitor='val_loss', patience=10)])
+    ErrMse_trainer = 100
+    Tentativa = 1
 
-    evaluate_model(X_test_scaled, y_test_scaled, best_model)
-    best_model.save(model_path)
-    print("Modelo salvo.")
+    while ErrMse_trainer > 50:
+        print(f"\nTENTATIVA: {Tentativa}\nContinuando o treinamento com os novos dados...")
+        best_model.fit(X_train_scaled, y_train_scaled, epochs=100, validation_split=0.2, batch_size=16, callbacks=[EarlyStopping(monitor='val_loss', patience=10)])
 
-    print("\nPrevisão dos próximos números...")
-    last_five_draws = dados.iloc[-12:, 1:].values.flatten()
-    last_five_scaled = scaler_X.transform(last_five_draws.reshape(1, -1)).reshape(1, 72, 1)
-    predicted_scaled = best_model.predict(last_five_scaled)
-    predicted_numbers = np.clip(scaler_y.inverse_transform(predicted_scaled).astype(int), 1, 60)
-    print("\nNúmeros previstos para o próximo sorteio:", predicted_numbers[0])
-    print("\nNúmeros previstos para o próximo sorteio 2:", predicted_scaled[0])
+        ErrMse_trainer = evaluate_model(X_test_scaled, y_test_scaled, best_model)
+        best_model.save(model_path)
+        print("Modelo salvo.")
 
-    escrever = f"\nNúmeros previstos para o próximo sorteio: {predicted_numbers[0]}\nTambém: {predicted_scaled[0].astype(int)}"
-    with open("MEGA-SENA/Resultados_megasena.txt", 'a') as f:
-        f.write(escrever)
+        print("\nPrevisão dos próximos números...")
+        diasAnalise = 66
+        last_five_draws = dados.iloc[-diasAnalise:, 1:].values.flatten()
+        last_five_scaled = scaler_X.transform(last_five_draws.reshape(1, -1)).reshape(1, diasAnalise * 6, 1)
+        predicted_scaled = best_model.predict(last_five_scaled)
+        predicted_numbers = np.clip(scaler_y.inverse_transform(predicted_scaled).astype(int), 1, 60)
+        print("\nNúmeros previstos para o próximo sorteio:", predicted_numbers[0])
+        print("\nNúmeros previstos para o próximo sorteio 2:", predicted_scaled[0])
 
-    # Continuação do código de previsão...
+        escrever = f"\nNúmeros previstos para o próximo sorteio: {predicted_numbers[0]}\nTambém: {predicted_scaled[0].astype(int)}"
+        with open("MEGA-SENA/Resultados_megasena.txt", 'a') as f:
+            f.write(escrever)
+
+        if ErrMse_trainer <= 50:
+            break
+        if Tentativa >= 100:
+            break
+        Tentativa += 1
  
 
 
