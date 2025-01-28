@@ -89,8 +89,9 @@ def prepare_data(data, X_filename, y_filename, force_prepare=False):
 
     if not data.empty:
         print("Adicionando novos dados...")
-        X_new = np.array([data.iloc[i - 12:i, 1:].values.flatten() for i in tqdm(range(12, len(data)), desc="Preparando dados", unit="iteração")])
-        y_new = np.array([data.iloc[i, 1:].values for i in range(12, len(data))])
+        diasAnalise = 66
+        X_new = np.array([data.iloc[i - diasAnalise:i, 1:].values.flatten() for i in tqdm(range(diasAnalise, len(data)), desc="Preparando dados", unit="iteração")])
+        y_new = np.array([data.iloc[i, 1:].values for i in range(diasAnalise, len(data))])
 
         if X_existing.size > 0:
             X = np.concatenate((X_existing, X_new))
@@ -254,8 +255,9 @@ if __name__ == "__main__":
         print("Modelo salvo.")
 
         print("\nPrevisão dos próximos números...")
-        last_five_draws = dados.iloc[-12:, 1:].values.flatten()
-        last_five_scaled = scaler_X.transform(last_five_draws.reshape(1, -1)).reshape(1, 72, 1)
+        diasAnalise = 66
+        last_five_draws = dados.iloc[-diasAnalise:, 1:].values.flatten()
+        last_five_scaled = scaler_X.transform(last_five_draws.reshape(1, -1)).reshape(1, diasAnalise * 6, 1)
         predicted_scaled = best_model.predict(last_five_scaled)
         predicted_numbers = np.clip(scaler_y.inverse_transform(predicted_scaled).astype(int), 1, 60)
         print("\nNúmeros previstos para o próximo sorteio:", predicted_numbers[0])
