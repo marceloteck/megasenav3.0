@@ -142,6 +142,10 @@ def evaluate_model(X_test_scaled, y_test_scaled, best_model):
     print(f"Erro Médio Quadrado (MSE): {mse}")
     print(f"Erro Absoluto Médio (MAE): {mae}")
 
+    escrever = f"\n\nMAIS UM RESULTADO:\nErro Médio Quadrado (MSE): {mse}\nErro Absoluto Médio (MAE): {mae}"
+    with open("MEGA-SENA/Resultados_megasena.txt", 'a') as f:
+        f.write(escrever)
+
 def gerar_dados_sinteticos(dados_reais, num_amostras=1000):
     # Contar a frequência de cada número nos dados reais, excluindo o zero
     todos_numeros = dados_reais.iloc[:, 1:].values.flatten()
@@ -251,6 +255,10 @@ if __name__ == "__main__":
     predicted_numbers = np.clip(scaler_y.inverse_transform(predicted_scaled).astype(int), 1, 60)
     print("\nNúmeros previstos para o próximo sorteio:", predicted_numbers[0])
     print("\nNúmeros previstos para o próximo sorteio 2:", predicted_scaled[0])
+
+    escrever = f"\nNúmeros previstos para o próximo sorteio: {predicted_numbers[0]}\nTambém: {predicted_scaled[0].astype(int)}"
+    with open("MEGA-SENA/Resultados_megasena.txt", 'a') as f:
+        f.write(escrever)
 
     # Continuação do código de previsão...
  
