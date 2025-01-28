@@ -89,8 +89,9 @@ def prepare_data(data, X_filename, y_filename, force_prepare=False):
 
     if not data.empty:
         print("Adicionando novos dados...")
-        X_new = np.array([data.iloc[i - 40:i, 1:].values.flatten() for i in tqdm(range(40, len(data)), desc="Preparando dados", unit="iteração")])
-        y_new = np.array([data.iloc[i, 1:].values for i in range(40, len(data))])
+        diasAnalise = 40
+        X_new = np.array([data.iloc[i - diasAnalise:i, 1:].values.flatten() for i in tqdm(range(diasAnalise, len(data)), desc="Preparando dados", unit="iteração")])
+        y_new = np.array([data.iloc[i, 1:].values for i in range(diasAnalise, len(data))])
 
         if X_existing.size > 0:
             X = np.concatenate((X_existing, X_new))
@@ -143,63 +144,9 @@ def evaluate_model(X_test_scaled, y_test_scaled, best_model):
     print(f"Erro Absoluto Médio (MAE): {mae}")
     
     escrever = f"\n\nMAIS UM RESULTADO:\nErro Médio Quadrado (MSE): {mse}\nErro Absoluto Médio (MAE): {mae}"
-    
     with open("LOTOFACIL/Resultados_lotofacil.txt", 'a') as f:
-    #for file in escrever:
         f.write(escrever)
 
-def gerar_dados_sinteticos(dados_reais, num_amostras=1000):
-    # Contar a frequência de cada número nos dados reais, excluindo o zero
-    todos_numeros = dados_reais.iloc[:, 1:].values.flatten()
-    todos_numeros = [num for num in todos_numeros if num != 0]
-    frequencia = Counter(todos_numeros)
-    total_numeros = sum(frequencia.values())
-    
-    # Converter as frequências em probabilidades
-    probabilidade = {num: freq / total_numeros for num, freq in frequencia.items()}
-    
-    # Obter as datas já existentes para evitar duplicação
-    datas_existentes = set(dados_reais['Data'].dt.strftime('%d/%m/%Y'))
-    
-    # Gerar dados sintéticos
-    dados_sinteticos = []
-    for i in range(num_amostras):
-        tentativas = 0
-        limite_tentativas = 100  # Define um limite para evitar loop infinito
-        
-        while tentativas < limite_tentativas:
-            # Selecionar 6 números baseados nas probabilidades
-            numeros = random.choices(
-                population=list(probabilidade.keys()), 
-                weights=list(probabilidade.values()), 
-                k=6
-            )
-            
-            # Verificar se os números estão dentro de uma soma realista
-            if 100 <= sum(numeros) <= 300:
-                numeros.sort()  # Ordenar os números em ordem crescente
-                
-                # Gerar uma data aleatória
-                dia = random.randint(1, 28)
-                mes = random.randint(1, 12)
-                ano = random.randint(1996, 2023)
-                data_ficticia = f"{dia:02d}/{mes:02d}/{ano}"
-                
-                if data_ficticia not in datas_existentes:
-                    break  # Encontramos uma data única
-            tentativas += 1
-        
-        if tentativas < limite_tentativas:
-            dados_sinteticos.append([data_ficticia] + numeros)
-            datas_existentes.add(data_ficticia)  # Adicionar a nova data ao conjunto para evitar duplicações
-    
-    # Converter para DataFrame para facilitar a manipulação posterior
-    df_sinteticos = pd.DataFrame(dados_sinteticos, columns=["Data"] + [f"Numero{i+1}" for i in range(12)])
-    return df_sinteticos
-
-
-
-    
 
 # Execução principal
 if __name__ == "__main__":
@@ -207,21 +154,6 @@ if __name__ == "__main__":
 
     all_data = load_and_preprocess_data(folder_path, processed_files_filename, X_filename)
     dados = load_dados(folder_path)
-    """
-    dados_sinteticos = gerar_dados_sinteticos(dados)
-
-    if isinstance(all_data, list) and all_data:
-        all_data = pd.concat(all_data, ignore_index=True)
-    else:
-        all_data = pd.DataFrame()
-
-    if all_data.empty:
-        combined_data = dados_sinteticos
-    else:
-        combined_data = pd.concat([all_data, dados_sinteticos], ignore_index=True)
-
-    combined_data_list = combined_data.values.tolist()
-    """
 
     X, y = prepare_data(all_data, X_filename, y_filename)
     
@@ -245,26 +177,35 @@ if __name__ == "__main__":
         best_model = tuner.hypermodel.build(best_hps)
         best_model.fit(X_train_scaled, y_train_scaled, epochs=500, validation_split=0.2, batch_size=16, callbacks=[EarlyStopping(monitor='val_loss', patience=10)])
 
-    print("\nContinuando o treinamento com os novos dados...")
-    best_model.fit(X_train_scaled, y_train_scaled, epochs=200, validation_split=0.2, batch_size=16, callbacks=[EarlyStopping(monitor='val_loss', patience=10)])
+    ErrMse_trainer = 100
+    Tentativa = 1
 
-    evaluate_model(X_test_scaled, y_test_scaled, best_model)
-    best_model.save(model_path)
-    print("Modelo salvo.")
+    while ErrMse_trainer > 50:
+        print(f"\nTENTATIVA: {Tentativa}\nContinuando o treinamento com os novos dados...")
+        best_model.fit(X_train_scaled, y_train_scaled, epochs=200, validation_split=0.2, batch_size=16, callbacks=[EarlyStopping(monitor='val_loss', patience=10)])
 
-    print("\nPrevisão dos próximos números...")
-    last_five_draws = dados.iloc[-40:, 1:].values.flatten()
-    last_five_scaled = scaler_X.transform(last_five_draws.reshape(1, -1)).reshape(1, 600, 1)
-    predicted_scaled = best_model.predict(last_five_scaled)
-    predicted_numbers = np.clip(scaler_y.inverse_transform(predicted_scaled).astype(int), 1, 25)
-    print("\nNúmeros previstos para o próximo sorteio:", predicted_numbers[0])
-    print("\nNúmeros previstos para o próximo sorteio 2:", predicted_scaled[0].astype(int))
-    
-    escrever = f"\nNúmeros previstos para o próximo sorteio: {predicted_numbers[0]}\nTambém: {predicted_scaled[0].astype(int)}"
-    with open("LOTOFACIL/Resultados_lotofacil.txt", 'a') as f:
-        f.write(escrever)
+        evaluate_model(X_test_scaled, y_test_scaled, best_model)
+        best_model.save(model_path)
+        print("Modelo salvo.")
 
-    # Continuação do código de previsão...
+        print("\nPrevisão dos próximos números...")
+        diasAnalise = 40
+        last_five_draws = dados.iloc[-diasAnalise:, 1:].values.flatten()
+        last_five_scaled = scaler_X.transform(last_five_draws.reshape(1, -1)).reshape(1, diasAnalise * 15, 1)
+        predicted_scaled = best_model.predict(last_five_scaled)
+        predicted_numbers = np.clip(scaler_y.inverse_transform(predicted_scaled).astype(int), 1, 25)
+        print("\nNúmeros previstos para o próximo sorteio:", predicted_numbers[0])
+        print("\nNúmeros previstos para o próximo sorteio 2:", predicted_scaled[0].astype(int))
+        
+        escrever = f"\nNúmeros previstos para o próximo sorteio: {predicted_numbers[0]}\nTambém: {predicted_scaled[0].astype(int)}"
+        with open("LOTOFACIL/Resultados_lotofacil.txt", 'a') as f:
+            f.write(escrever)
+
+        if ErrMse_trainer <= 50:
+            break
+        if Tentativa >= 100:
+            break
+        Tentativa += 1
  
 
 
