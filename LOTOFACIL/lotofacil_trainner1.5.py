@@ -38,12 +38,12 @@ keras.config.enable_unsafe_deserialization()
 # Variáveis globais e configurações
 new_trainer = "noTrainer"  # Opções: "yesTrainer" | "noTrainer"
 current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
-folder_path = 'MEGA-SENA/dados_megasena/'
-X_filename = 'MEGA-SENA/BaseDados/prepared_data_X.npy'
-y_filename = 'MEGA-SENA/BaseDados/prepared_data_y.npy'
-processed_files_filename = 'MEGA-SENA/processed_files.txt'
-model_path = ('MEGA-SENA/Trainner/megasena_model_training.keras' if new_trainer == "noTrainer" 
-              else f'MEGA-SENA/Trainner/megasena_model_training.{current_time}.keras')
+folder_path = 'LOTOFACIL/dados_lotofacil/'
+X_filename = 'LOTOFACIL/BaseDados/prepared_data_X.npy'
+y_filename = 'LOTOFACIL/BaseDados/prepared_data_y.npy'
+processed_files_filename = 'LOTOFACIL/processed_files.txt'
+model_path = ('LOTOFACIL/Trainner/lotofacil_model_training.keras' if new_trainer == "noTrainer" 
+              else f'LOTOFACIL/Trainner/lotofacil_model_training.{current_time}.keras')
 
 # Funções utilitárias e de processamento de dados
 def load_dados(folder_path):
@@ -141,6 +141,12 @@ def evaluate_model(X_test_scaled, y_test_scaled, best_model):
     mae = mean_absolute_error(y_test_rescaled, y_pred)
     print(f"Erro Médio Quadrado (MSE): {mse}")
     print(f"Erro Absoluto Médio (MAE): {mae}")
+    
+    escrever = f"\n\nMAIS UM RESULTADO:\nErro Médio Quadrado (MSE): {mse}\nErro Absoluto Médio (MAE): {mae}"
+    
+    with open("LOTOFACIL/Resultados_lotofacil.txt", 'a') as f:
+    #for file in escrever:
+        f.write(escrever)
 
 def gerar_dados_sinteticos(dados_reais, num_amostras=1000):
     # Contar a frequência de cada número nos dados reais, excluindo o zero
@@ -188,7 +194,7 @@ def gerar_dados_sinteticos(dados_reais, num_amostras=1000):
             datas_existentes.add(data_ficticia)  # Adicionar a nova data ao conjunto para evitar duplicações
     
     # Converter para DataFrame para facilitar a manipulação posterior
-    df_sinteticos = pd.DataFrame(dados_sinteticos, columns=["Data"] + [f"Numero{i+1}" for i in range(15)])
+    df_sinteticos = pd.DataFrame(dados_sinteticos, columns=["Data"] + [f"Numero{i+1}" for i in range(12)])
     return df_sinteticos
 
 
@@ -201,6 +207,7 @@ if __name__ == "__main__":
 
     all_data = load_and_preprocess_data(folder_path, processed_files_filename, X_filename)
     dados = load_dados(folder_path)
+    """
     dados_sinteticos = gerar_dados_sinteticos(dados)
 
     if isinstance(all_data, list) and all_data:
@@ -214,8 +221,9 @@ if __name__ == "__main__":
         combined_data = pd.concat([all_data, dados_sinteticos], ignore_index=True)
 
     combined_data_list = combined_data.values.tolist()
+    """
 
-    X, y = prepare_data(combined_data_list, X_filename, y_filename)
+    X, y = prepare_data(all_data, X_filename, y_filename)
     
 
     print("Iniciando treinamento...")
@@ -235,10 +243,10 @@ if __name__ == "__main__":
         print("\nTreinando o melhor modelo...")
         tuner, best_hps = tune_hyperparameters(X_train_scaled, y_train_scaled)
         best_model = tuner.hypermodel.build(best_hps)
-        best_model.fit(X_train_scaled, y_train_scaled, epochs=500, validation_split=0.2, batch_size=16, callbacks=[EarlyStopping(monitor='val_loss', patience=10)])
+        best_model.fit(X_train_scaled, y_train_scaled, epochs=1, validation_split=0.2, batch_size=16, callbacks=[EarlyStopping(monitor='val_loss', patience=10)])
 
     print("\nContinuando o treinamento com os novos dados...")
-    best_model.fit(X_train_scaled, y_train_scaled, epochs=100, validation_split=0.2, batch_size=16, callbacks=[EarlyStopping(monitor='val_loss', patience=10)])
+    best_model.fit(X_train_scaled, y_train_scaled, epochs=1, validation_split=0.2, batch_size=16, callbacks=[EarlyStopping(monitor='val_loss', patience=10)])
 
     evaluate_model(X_test_scaled, y_test_scaled, best_model)
     best_model.save(model_path)
@@ -250,7 +258,11 @@ if __name__ == "__main__":
     predicted_scaled = best_model.predict(last_five_scaled)
     predicted_numbers = np.clip(scaler_y.inverse_transform(predicted_scaled).astype(int), 1, 25)
     print("\nNúmeros previstos para o próximo sorteio:", predicted_numbers[0])
-    print("\nNúmeros previstos para o próximo sorteio 2:", predicted_scaled[0])
+    print("\nNúmeros previstos para o próximo sorteio 2:", predicted_scaled[0].astype(int))
+    
+    escrever = f"\nNúmeros previstos para o próximo sorteio: {predicted_numbers[0]}\nTambém: {predicted_scaled[0].astype(int)}"
+    with open("LOTOFACIL/Resultados_lotofacil.txt", 'a') as f:
+        f.write(escrever)
 
     # Continuação do código de previsão...
  

@@ -1,3 +1,4 @@
 lotofacil.csv
 lotofacil_base.csv
 lotofacil.csv
+lotofacil.csv
