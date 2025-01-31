@@ -70,23 +70,20 @@ def calcular_sequencia_prevista(ultimo_sorteio, ajustes_previstos):
     return [(ultimo_sorteio[i] + ajustes_previstos[i] - 1) % 25 + 1 for i in range(15)]
 
 # Nova função para formar uma sequência com base nas três opções
-def calcular_nova_sequencia(modelo, opcoes_ajustes):
+def calcular_nova_sequencia(opcoes_ajustes):
     todas_previsoes = np.array(opcoes_ajustes).flatten()
 
-    # Frequência de cada número
+    # Frequência de cada número válido (1 a 25)
     numeros_unicos, frequencias = np.unique(todas_previsoes, return_counts=True)
 
-    # Treinar um modelo para determinar a força dos números
-    X = numeros_unicos.reshape(-1, 1)
-    y = frequencias
+    # Filtrar para manter números dentro da faixa válida (1 a 25)
+    numeros_validos = [(num, freq) for num, freq in zip(numeros_unicos, frequencias) if 1 <= num <= 25]
 
-    modelo.fit(X, y)
-
-    # Predizer os 15 números com maior probabilidade
-    numeros_ordenados = sorted(zip(numeros_unicos, modelo.predict(X)), key=lambda x: -x[1])
+    # Ordenar por frequência decrescente
+    numeros_validos.sort(key=lambda x: -x[1])
 
     # Pegar os 15 melhores
-    nova_sequencia = [num for num, _ in numeros_ordenados[:15]]
+    nova_sequencia = [num for num, _ in numeros_validos[:15]]
     return sorted(nova_sequencia)
 
 # Função principal para processar dados e armazenar histórico
@@ -128,8 +125,8 @@ def processar_dados_e_armazenar_ajustes(caminho_csv):
         opcoes_sequencias.append(sequencia_prevista)
     
     # Gerar a nova sequência baseada nas três opções
-    nova_sequencia = calcular_nova_sequencia(modelo, opcoes_sequencias)
-    print(f"\n\nNova sequência com maior probabilidade de acerto: {nova_sequencia}")
+    nova_sequencia = calcular_nova_sequencia(opcoes_sequencias)
+    print(f"\nNova sequência com maior probabilidade de acerto: {nova_sequencia}")
 
 
 # Caminho do arquivo CSV
