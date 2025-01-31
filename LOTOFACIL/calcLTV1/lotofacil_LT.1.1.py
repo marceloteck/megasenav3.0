@@ -54,9 +54,8 @@ def treinar_modelo(ajustes_hist):
     
     return modelo
 
-# Função para prever três opções de ajustes
 def prever_tres_opcoes_ajustes(modelo, ultimo_ajuste):
-    previsao_central = modelo.predict([ultimo_ajuste])[0].astype(int)
+    previsao_central = modelo.predict([ultimo_ajuste])[0].astype(int).tolist()
 
     # Gerar opções variando a previsão central
     margem_variacao = 1  # Pequena variação nos ajustes
@@ -64,7 +63,7 @@ def prever_tres_opcoes_ajustes(modelo, ultimo_ajuste):
     previsao_opcao1 = [(n + margem_variacao) % 25 for n in previsao_central]  # Ajuste positivo
     previsao_opcao2 = [(n - margem_variacao) % 25 for n in previsao_central]  # Ajuste negativo
     
-    return [previsao_central.tolist(), previsao_opcao1, previsao_opcao2]
+    return [previsao_central, previsao_opcao1, previsao_opcao2]
 
 # Função para calcular a sequência prevista com base nos ajustes
 def calcular_sequencia_prevista(ultimo_sorteio, ajustes_previstos):
@@ -97,14 +96,15 @@ def processar_dados_e_armazenar_ajustes(caminho_csv):
     ultimo_ajuste = ajustes_hist[-1]
     previsoes_ajustes = prever_tres_opcoes_ajustes(modelo, ultimo_ajuste)
     
-    print(f"\nTrês opções de previsões de ajustes para o próximo sorteio: {previsoes_ajustes.astype(int)}")
+    print(f"\nTrês opções de previsões de ajustes para o próximo sorteio: {previsoes_ajustes}")
     
     ultimo_sorteio = dados_csv[-1]
     print("\nNúmeros previstos com as três opções de ajustes:")
     
     for i, ajustes_previstos in enumerate(previsoes_ajustes, 1):
         sequencia_prevista = calcular_sequencia_prevista(ultimo_sorteio, ajustes_previstos)
-        print(f"Opção {i}: {list(map(lambda x: x if x != 0 else 25, sequencia_prevista))}")
+        print(f"Opção {i}: {list(map(int, sorted(sequencia_prevista)))}")
+
 
 # Caminho do arquivo CSV
 caminho_do_csv = "lotofacil.csv"
