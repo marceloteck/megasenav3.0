@@ -126,7 +126,7 @@ def processar_dados_e_armazenar_ajustes(caminho_csv):
     
     # Gerar a nova sequência baseada nas três opções
     nova_sequencia = calcular_nova_sequencia(opcoes_sequencias)
-    print(f"\nNova sequência com maior probabilidade de acerto: {nova_sequencia}")
+    print(f"\nNova sequência com maior probabilidade de acerto: {list(map(int, nova_sequencia))}")
 
 
 # Caminho do arquivo CSV
