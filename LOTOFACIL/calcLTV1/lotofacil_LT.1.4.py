@@ -1,6 +1,7 @@
 import csv
 import os
 from sklearn.linear_model import LinearRegression
+from sklearn.tree import DecisionTreeClassifier
 import numpy as np
 
 # Função para carregar dados do CSV
@@ -14,10 +15,8 @@ def carregar_dados_csv(caminho_csv):
             try:
                 dados.append([int(n) for n in linha[:15]])  # Considera os 15 primeiros números da Lotofácil
             except ValueError:
-                # Ignorar linhas mal formatadas
                 continue
 
-    # Filtrar apenas sequências com 15 números
     dados = [linha for linha in dados if len(linha) == 15]
     return dados
 
@@ -31,21 +30,19 @@ def salvar_historico_ajustes(previsao_lt, ajustes):
     with open(historico_path, "a") as arquivo:
         arquivo.write(f"Previsao: {previsao_lt}, Ajustes: {ajustes}\n")
 
-# Função para treinar o modelo
+# Função para treinar o modelo inicial
 def treinar_modelo(ajustes_hist):
     X = []
     y = []
 
-    # Considerando ajustes anteriores como entrada para prever o próximo ajuste
     for i in range(len(ajustes_hist) - 1):
-        X.append(ajustes_hist[i])  # Ajuste atual
-        y.append(ajustes_hist[i + 1])  # Ajuste seguinte (a ser previsto)
+        X.append(ajustes_hist[i])
+        y.append(ajustes_hist[i + 1])
 
     if len(X) == 0:
         print("Dados insuficientes para treinar o modelo.")
         return None
 
-    # Convertendo para numpy arrays para o modelo
     X = np.array(X)
     y = np.array(y)
 
@@ -58,11 +55,10 @@ def treinar_modelo(ajustes_hist):
 def prever_tres_opcoes_ajustes(modelo, ultimo_ajuste):
     previsao_central = modelo.predict([ultimo_ajuste])[0].astype(int).tolist()
 
-    # Gerar opções variando a previsão central
     margem_variacao = 1  # Pequena variação nos ajustes
 
-    previsao_opcao1 = [(n + margem_variacao) % 25 for n in previsao_central]  # Ajuste positivo
-    previsao_opcao2 = [(n - margem_variacao) % 25 for n in previsao_central]  # Ajuste negativo
+    previsao_opcao1 = [(n + margem_variacao) % 25 for n in previsao_central]
+    previsao_opcao2 = [(n - margem_variacao) % 25 for n in previsao_central]
 
     return [previsao_central, previsao_opcao1, previsao_opcao2]
 
@@ -70,51 +66,15 @@ def prever_tres_opcoes_ajustes(modelo, ultimo_ajuste):
 def calcular_sequencia_prevista(ultimo_sorteio, ajustes_previstos):
     return [(ultimo_sorteio[i] + ajustes_previstos[i] - 1) % 25 + 1 for i in range(15)]
 
-# Nova função para formar uma sequência com base nas três opções mantendo aprendizado do modelo
-def calcular_nova_sequencia_v1(opcoes_ajustes, modelo):
-    # Combina todas as opções de ajustes e aplica aprendizado do modelo para priorizar padrões fortes
-    todas_previsoes = np.array(opcoes_ajustes).flatten()
+# Função para segundo treinamento e ajuste de previsão
+def treinar_modelo_correcao(sequencias_opcoes, sequencia_esperada):
+    X = np.array(sequencias_opcoes)
+    y = np.array(sequencia_esperada)
 
-    # Frequência de cada número válido (1 a 25)
-    numeros_unicos, frequencias = np.unique(todas_previsoes, return_counts=True)
+    modelo_correcao = DecisionTreeClassifier()
+    modelo_correcao.fit(X, y)
 
-    # Filtrar para manter números dentro da faixa válida (1 a 25)
-    numeros_validos = [(num, freq) for num, freq in zip(numeros_unicos, frequencias) if 1 <= num <= 25]
-
-    # Ordenar por frequência decrescente, mas ponderando pelo modelo
-    numeros_validos.sort(key=lambda x: -x[1])
-
-    # Aplicar peso para números com base na previsão central
-    previsao_base = np.array(opcoes_ajustes[0])  # Base na primeira opção
-    pesos = modelo.predict([previsao_base])[0].tolist()
-    pesos = [max(1, int(peso)) for peso in pesos]
-
-    # Associar pesos aos números válidos
-    numeros_com_pesos = [(num, freq * pesos[idx % len(pesos)]) for idx, (num, freq) in enumerate(numeros_validos)]
-
-    # Ordenar por relevância ponderada
-    numeros_com_pesos.sort(key=lambda x: -x[1])
-
-    # Pegar os 15 melhores números
-    nova_sequencia = [num for num, _ in numeros_com_pesos[:15]]
-    return sorted(nova_sequencia)
-
-# Função atualizada para calcular nova sequência baseada nas três opções
-def calcular_nova_sequencia(opcoes_ajustes):
-    # Combinar todas as opções, priorizando a primeira
-    base_prioritaria = opcoes_ajustes[0]  # Base principal
-    complementares = opcoes_ajustes[1:]  # Outras opções
-
-    nova_sequencia = set(base_prioritaria)  # Iniciar com números da base principal
-
-    # Adicionar números das outras opções até completar os 15 números
-    for opcao in complementares:
-        for numero in opcao:
-            if len(nova_sequencia) < 15 and numero not in nova_sequencia:
-                nova_sequencia.add(numero)
-
-    return sorted(nova_sequencia)
-
+    return modelo_correcao
 
 # Função principal para processar dados e armazenar histórico
 def processar_dados_e_armazenar_ajustes(caminho_csv):
@@ -140,9 +100,6 @@ def processar_dados_e_armazenar_ajustes(caminho_csv):
 
     modelo = treinar_modelo(ajustes_hist)
 
-    if modelo is None:
-        return
-
     ultimo_ajuste = ajustes_hist[-1]
     previsoes_ajustes = prever_tres_opcoes_ajustes(modelo, ultimo_ajuste)
 
@@ -154,13 +111,19 @@ def processar_dados_e_armazenar_ajustes(caminho_csv):
     opcoes_sequencias = []
     for i, ajustes_previstos in enumerate(previsoes_ajustes, 1):
         sequencia_prevista = calcular_sequencia_prevista(ultimo_sorteio, ajustes_previstos)
-        print(f"Opção {i}: {list(map(int, sorted(sequencia_prevista)))}")
+        print(f"Opção {i}: {sorted(sequencia_prevista)}")
         opcoes_sequencias.append(sequencia_prevista)
 
-    # Gerar a nova sequência baseada nas três opções com aprendizado do modelo
-    #nova_sequencia = calcular_nova_sequencia(opcoes_sequencias, modelo)
-    nova_sequencia = calcular_nova_sequencia(opcoes_sequencias)
-    print(f"\nNova sequência com maior probabilidade de acerto: {list(map(int, nova_sequencia))}")
+    # Sequência esperada manualmente fornecida
+    sequencia_esperada = [1, 3, 5, 6, 8, 9, 10, 12, 13, 17, 18, 19, 21, 24, 25]
+
+    # Segundo treinamento com base nas opções geradas
+    modelo_correcao = treinar_modelo_correcao(opcoes_sequencias, sequencia_esperada)
+
+    # Prever a sequência ajustada com base nas três opções
+    previsao_final = modelo_correcao.predict(opcoes_sequencias)[0]
+
+    print(f"\nNova sequência com maior probabilidade de acerto: {sorted(previsao_final)}")
 
 
 # Caminho do arquivo CSV
