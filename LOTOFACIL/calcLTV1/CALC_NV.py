@@ -92,3 +92,5 @@ print("Nova sequência adaptada:", nova_sequencia)
 
 # cd LOTOFACIL/calcLTV1
 # python CALC_NV.py
+
+#[1 3 5 6 8 9 10 12 13 17 18 19 21 24 25]
