@@ -45,7 +45,9 @@ def adaptar_sequencia(opcoes):
                         usados.add(outro_proximo)
             continue
 
-        # Condição 4: Se op2[i - 1] e op3[i - 1] forem ambos 13
+        
+        
+       # Condição 4: Se op2[i - 1] e op3[i - 1] forem ambos 13       
         if i > 0 and op2[i - 1] == 13 and op3[i - 1] == 13:
             if 13 not in usados:
                 nova_sequencia.append(13)
@@ -68,8 +70,7 @@ def adaptar_sequencia(opcoes):
                 nova_sequencia.append(op1[i])
                 usados.add(op1[i])
 
-            if op1[i] == 24 and op3[i] == 25:
-                usados.add(25)  # Adiciona 25 diretamente
+            
         else:
             # Mantém op1 como escolha padrão
             if op1[i] not in usados:
@@ -80,9 +81,17 @@ def adaptar_sequencia(opcoes):
     while len(nova_sequencia) < len(op1):
         for num in range(1, 26):  # Supondo que os números variem de 1 a 25
             if num not in usados:
-                nova_sequencia.append(num)
-                usados.add(num)
-                break
+                # Lógica especial para garantir que 25 seja o último número
+                if op1[-1] == 24 or op3[-1] == 25 or op2[-1] == 25:
+                    nova_sequencia.append(25)
+                    usados.add(25)
+                    break
+                else:
+                    nova_sequencia.append(num)
+                    usados.add(num)
+                    break
+
+
 
     return nova_sequencia[:len(op1)]
 
