@@ -60,11 +60,7 @@ def adaptar_sequencia(op1, op2, op3):
                 usados.add(op1[i])
         # Condição 1: Se op2 e op3 forem iguais
         elif op2[i] == op3[i]:
-            if i > 0 and op1[i-1] + 1 == op2[i-1] and op2[i-1] + 1 == op3[i-1]:
-                usados.add(op3[i+1])  # Adiciona o próximo número de op3
-            elif op1[i] == 24 and op2[i] == 25 and op3[i] == 25:
-                usados.add(25)  # Adiciona 25 diretamente
-            elif op1[i] not in usados:
+            if op1[i] not in usados:
                 nova_sequencia.append(op1[i])
                 usados.add(op1[i])
         else:
